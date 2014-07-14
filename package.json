@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "cson": "^1.6.0",
+    "loophole": "^1.0.0",
     "semver": "^2.3.1"
   },
   "devDependencies": {

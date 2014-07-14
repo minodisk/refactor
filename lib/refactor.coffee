@@ -2,8 +2,8 @@ RefactorView = require './refactor-view'
 { satisfies } = require 'semver'
 { readFileSync } = require 'fs'
 { allowUnsafeEval } = require 'loophole'
-cson =  allowUnsafeEval -> require 'cson'
-console.log require('util').inspect cson
+# { parseFileSync } =  allowUnsafeEval -> require 'cson'
+# console.log require('util').inspect cson
 
 isFunction = (func) -> typeof func is 'function'
 
@@ -14,6 +14,9 @@ module.exports =
   activate: (state) ->
     packageManager = atom.packages
     { version } = JSON.parse readFileSync 'package.json'
+
+    packageManager.on 'activated', (e) ->
+      console.log 'activated'
 
     # Search packages related to refactor package.
     for metaData in packageManager.getAvailablePackageMetadata()
@@ -33,11 +36,20 @@ module.exports =
 
     @refactorView = new RefactorView state.refactorViewState
 
-    atom.workspaceView.command '', @onRename
-    atom.workspaceView.command '', @onDone
+    atom.workspaceView.command 'refactor:rename', @rename
+    atom.workspaceView.command 'refactor:done', @done
 
   deactivate: ->
+    atom.workspaceView.off 'refactor:rename', @rename
+    atom.workspaceView.off 'refactor:done', @done
+
     @refactorView.destroy()
 
   serialize: ->
     refactorViewState: @refactorView.serialize()
+
+  rename: (e) ->
+    console.log 'rename'
+
+  done: (e) ->
+    console.log 'done'
