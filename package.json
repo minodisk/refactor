@@ -1,0 +1,14 @@
+{
+  "name": "refactor",
+  "main": "./lib/refactor",
+  "version": "0.0.0",
+  "description": "A short description of your package",
+  "activationEvents": ["refactor:toggle"],
+  "repository": "https://github.com/atom/refactor",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {
+  }
+}
