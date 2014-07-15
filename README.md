@@ -5,4 +5,4 @@
 ### Interface of refactoring module
 
 * parse(code String, callback Function) void
-* find(range Range) []Range
+* find(range Range, editor Editor) []Range

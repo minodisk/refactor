@@ -40,16 +40,19 @@ class ModuleManager extends EventEmitter2
     .then (pkg) =>
       # Verify module interface.
 
-      { scopeNames, parse, find } = module = pkg.mainModule
+      { Ripper } = module = pkg.mainModule
 
-      unless Array.isArray(scopeNames) and isFunction(parse) and isFunction(find)
-        console.error "'#{name}' should implement scopeNames, parse() and find()"
+      unless Ripper? and
+             Array.isArray(Ripper.scopeNames) and
+             isFunction(Ripper::parse) and
+             isFunction(Ripper::find)
+        console.error "'#{name}' should implement Ripper.scopeNames, Ripper.parse() and Ripper.find()"
         return
 
-      for scopeName in scopeNames
+      for scopeName in Ripper.scopeNames
         @modules[scopeName] = module
 
       @emit 'changed'
 
-  get: (sourceName) ->
+  getModule: (sourceName) ->
     @modules[sourceName]

@@ -19,7 +19,7 @@ class HighlightView extends View
       @setEnabled config.get @configProperty
 
   destruct: ->
-    #TODO implement
+    @remove()
 
   update: (rowsList) ->
     @empty()

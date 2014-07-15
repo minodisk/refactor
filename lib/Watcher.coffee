@@ -8,8 +8,6 @@ StatusView = require './status/StatusView'
 module.exports =
 class Watcher extends EventEmitter2
 
-  # Ripper: null
-
   constructor: (@moduleManager, @editorView) ->
     super()
     @editor = @editorView.editor
@@ -43,13 +41,13 @@ class Watcher extends EventEmitter2
   verifyGrammar: =>
     @deactivate()
     scopeName = @editor.getGrammar().scopeName
-    @module = @moduleManager.get scopeName
+    @module = @moduleManager.getModule scopeName
     return unless @module?
     @activate()
 
   activate: ->
     # Setup model
-    # @ripper = new @Ripper @editor
+    @ripper = new @module.Ripper @editor
 
     # Setup views
     @referenceView = new ReferenceView
@@ -74,14 +72,15 @@ class Watcher extends EventEmitter2
     @editor.off 'contents-modified', @onContentsModified
 
     # Destruct instances
-    # @ripper?.destruct()
+    @ripper?.destruct()
     @referenceView?.destruct()
     @errorView?.destruct()
     @gutterView?.destruct()
     @statusView?.destruct()
 
     # Remove references
-    # delete @ripper
+    delete @module
+    delete @ripper
     delete @referenceView
     delete @errorView
     delete @gutterView
@@ -105,7 +104,7 @@ class Watcher extends EventEmitter2
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
-      @module.parse text, (err) =>
+      @ripper.parse text, (err) =>
         if err?
           @showError err
           return
@@ -134,12 +133,11 @@ class Watcher extends EventEmitter2
 
   updateReferences: =>
     ranges = []
-
     cursor = @editor.cursors[0]
     if cursor?
       range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
       unless range.isEmpty()
-        ranges = @module.find range
+        ranges = @ripper.find range
     rowsList = for range in ranges
       @rangeToRows range
     @referenceView.update rowsList
@@ -157,7 +155,7 @@ class Watcher extends EventEmitter2
 
     cursor = @editor.cursors[0]
     range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
-    refRanges = @module.find range
+    refRanges = @ripper.find range
     return false if refRanges.length is 0
 
     # Save cursor info.
