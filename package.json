@@ -2,7 +2,7 @@
   "name": "refactor",
   "main": "./lib/main",
   "version": "0.0.0",
-  "description": "A short description of your package",
+  "description": "Refactoring base package",
   "repository": "https://github.com/atom/refactor",
   "license": "MIT",
   "engines": {
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "cson": "^1.6.0",
+    "eventemitter2": "^0.4.14",
     "loophole": "^1.0.0",
     "semver": "^2.3.1"
   },

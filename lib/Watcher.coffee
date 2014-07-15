@@ -1,4 +1,4 @@
-{ EventEmitter } = require 'events'
+{ EventEmitter2 } = require 'eventemitter2'
 ReferenceView = require './background/ReferenceView'
 ErrorView = require './background/ErrorView'
 GutterView = require './gutter/GutterView'
@@ -6,24 +6,27 @@ StatusView = require './status/StatusView'
 { locationDataToRange } = require './utils/LocationDataUtil'
 
 module.exports =
-class Watcher extends EventEmitter
+class Watcher extends EventEmitter2
 
-  Ripper: null
-  scopeNames: []
+  # Ripper: null
 
-  constructor: (@editorView) ->
+  constructor: (@moduleManager, @editorView) ->
     super()
     @editor = @editorView.editor
-    @editor.on 'grammar-changed', @checkGrammar
-    @checkGrammar()
+    @editor.on 'grammar-changed', @verifyGrammar
+    @moduleManager.on 'changed', @verifyGrammar
+    @verifyGrammar()
 
   destruct: =>
     @removeAllListeners()
     @deactivate()
-    @editor.off 'grammar-changed', @checkGrammar
+    @editor.off 'grammar-changed', @verifyGrammar
+    @moduleManager.off 'changed', @verifyGrammar
 
+    delete @moduleManager
     delete @editorView
     delete @editor
+    delete @module
 
   onDestroyed: =>
     @emit 'destroyed', @
@@ -37,15 +40,16 @@ class Watcher extends EventEmitter
   4. Create instances and listeners.
   ###
 
-  checkGrammar: =>
+  verifyGrammar: =>
     @deactivate()
     scopeName = @editor.getGrammar().scopeName
-    return unless scopeName in @scopeNames
+    @module = @moduleManager.get scopeName
+    return unless @module?
     @activate()
 
   activate: ->
     # Setup model
-    @ripper = new @Ripper @editor
+    # @ripper = new @Ripper @editor
 
     # Setup views
     @referenceView = new ReferenceView
@@ -70,14 +74,14 @@ class Watcher extends EventEmitter
     @editor.off 'contents-modified', @onContentsModified
 
     # Destruct instances
-    @ripper?.destruct()
+    # @ripper?.destruct()
     @referenceView?.destruct()
     @errorView?.destruct()
     @gutterView?.destruct()
     @statusView?.destruct()
 
     # Remove references
-    delete @ripper
+    # delete @ripper
     delete @referenceView
     delete @errorView
     delete @gutterView
@@ -101,7 +105,7 @@ class Watcher extends EventEmitter
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
-      @ripper.parse text, (err) =>
+      @module.parse text, (err) =>
         if err?
           @showError err
           return
@@ -135,7 +139,7 @@ class Watcher extends EventEmitter
     if cursor?
       range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
       unless range.isEmpty()
-        ranges = @ripper.find range
+        ranges = @module.find range
     rowsList = for range in ranges
       @rangeToRows range
     @referenceView.update rowsList
@@ -153,7 +157,7 @@ class Watcher extends EventEmitter
 
     cursor = @editor.cursors[0]
     range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
-    refRanges = @ripper.find range
+    refRanges = @module.find range
     return false if refRanges.length is 0
 
     # Save cursor info.
@@ -209,7 +213,7 @@ class Watcher extends EventEmitter
   ###
 
   isActive: ->
-    @ripper? and atom.workspaceView.getActivePaneItem() is @editor
+    @module? and atom.workspaceView.getActivePaneItem() is @editor
 
   # Range to pixel based start and end range for each row.
   rangeToRows: ({ start, end }) ->

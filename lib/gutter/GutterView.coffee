@@ -10,7 +10,7 @@ class GutterView
 
 
   empty: ->
-    @gutter.removeClassFromAllLines 'coffee-refactor-error'
+    @gutter.removeClassFromAllLines 'refactor-error'
     @gutter
     .find '.line-number .icon-right'
     .attr 'title', ''
@@ -20,5 +20,5 @@ class GutterView
     return unless errors?
     for { range, message } in errors
       $ @gutter.getLineNumberElement range.start.row
-      .addClass 'coffee-refactor-error'
+      .addClass 'refactor-error'
       .attr 'title', message

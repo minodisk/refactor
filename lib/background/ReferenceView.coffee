@@ -4,7 +4,7 @@ module.exports =
 class ReferenceView extends HighlightView
 
   @className: 'refactor-reference'
-  configProperty: 'coffee-refactor.highlightReference'
+  configProperty: 'refactor.highlightReference'
 
   constructor: ->
     super

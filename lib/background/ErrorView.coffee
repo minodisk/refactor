@@ -4,7 +4,7 @@ module.exports =
 class ErrorView extends HighlightView
 
   @className: 'refactor-error'
-  configProperty: 'coffee-refactor.highlightError'
+  configProperty: 'refactor.highlightError'
 
   constructor: ->
     super

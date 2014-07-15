@@ -2,11 +2,7 @@
 
 ## API Documentation
 
-### Events
+### Interface of refactoring module
 
-* refactor:start
-* refactor:done
-
-### Methods
-
-* refactor(ranges []Range)
+* parse(code String, callback Function) void
+* find(range Range) []Range

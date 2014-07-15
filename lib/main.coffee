@@ -1,11 +1,8 @@
-RefactorView = require './refactor-view'
-{ satisfies } = require 'semver'
-{ readFileSync } = require 'fs'
-{ allowUnsafeEval } = require 'loophole'
-# { parseFileSync } =  allowUnsafeEval -> require 'cson'
-# console.log require('util').inspect cson
 Watcher = require './Watcher'
-{ packages: packageManager, config } = atom
+ModuleManager = require './ModuleManager'
+{ packages: packageManager } = atom
+
+#TODO npm uninstall --save loophole cson
 
 module.exports =
 new class Main
@@ -23,20 +20,22 @@ new class Main
   ###
 
   activate: (state) ->
-    @updateModules()
-    config.on 'updated.core-disabledPackages', @updateModules
-
+    @moduleManager = new ModuleManager
     @watchers = []
+
     atom.workspaceView.eachEditorView @onCreated
     atom.workspaceView.command @renameCommand, @onRename
     atom.workspaceView.command @doneCommand, @onDone
 
   deactivate: ->
-    atom.workspaceView.off @renameCommand, @onRename
-    atom.workspaceView.off @doneCommand, @onDone
+    @moduleManager.destruct()
+    delete @moduleManager
     for watcher in @watchers
       watcher.destruct()
     delete @watchers
+
+    atom.workspaceView.off @renameCommand, @onRename
+    atom.workspaceView.off @doneCommand, @onDone
 
   serialize: ->
 
@@ -45,33 +44,8 @@ new class Main
   Events
   ###
 
-  updateModules: ->
-    isFunction = (func) -> typeof func is 'function'
-    { version } = JSON.parse readFileSync 'package.json'
-
-    @modules = []
-
-    # Search packages related to refactor package.
-    for metaData in packageManager.getAvailablePackageMetadata()
-      # Verify enabled, defined in engines, and satisfied version.
-      { name, engines } = metaData
-      continue unless !packageManager.isPackageDisabled(name) and
-                      (requiredVersion = engines?.refactor)? and
-                      satisfies version, requiredVersion
-
-      packageManager
-      .activatePackage name
-      .then (pkg) =>
-        # Verify module interface.
-        { scopeNames, parse, find } = module = pkg.mainModule
-        console.log scopeName, parse, find
-        unless Array.isArray(scopeNames) and isFunction(parse) and isFunction(find)
-          console.error 'Refactor package should implement scopeNames, parse() and find()'
-          return
-        @modules.push module
-
   onCreated: (editorView) =>
-    watcher = new Watcher editorView
+    watcher = new Watcher @moduleManager, editorView
     watcher.on 'destroyed', @onDestroyed
     @watchers.push watcher
 
