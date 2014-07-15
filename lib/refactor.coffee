@@ -15,7 +15,7 @@ module.exports =
     packageManager = atom.packages
     { version } = JSON.parse readFileSync 'package.json'
 
-    packageManager.on 'activated', (e) ->
+    packageManager.on 'core.activated', (e) ->
       console.log 'activated'
 
     # Search packages related to refactor package.
@@ -31,7 +31,9 @@ module.exports =
       .then (pkg) =>
         # Verify interface.
         { parse, find } = module = pkg.mainModule
-        return unless isFunction(parse) and isFunction(find)
+        unless isFunction(parse) and isFunction(find)
+          # console.error 'Refactor package should implement parse() and find()'
+          return
         @modules.push module
 
     @refactorView = new RefactorView state.refactorViewState
