@@ -1,13 +1,11 @@
+View = require '../View'
 { $ } = require 'atom'
 
 module.exports =
-class GutterView
+class GutterView extends View
 
   constructor: (@gutter) ->
-
-  destruct: ->
-    #TODO implement
-
+    super()
 
   empty: ->
     @gutter.removeClassFromAllLines 'refactor-error'

@@ -5,6 +5,3 @@ class ErrorView extends HighlightView
 
   @className: 'refactor-error'
   configProperty: 'refactor.highlightError'
-
-  constructor: ->
-    super

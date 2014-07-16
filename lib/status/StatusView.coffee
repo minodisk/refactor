@@ -1,4 +1,4 @@
-{ View } = require 'atom'
+View = require '../View'
 
 module.exports =
 class StatusView extends View
@@ -7,12 +7,3 @@ class StatusView extends View
     @div class: 'refactor-status inline-block', =>
       @span class: 'lint-name'
       @span class: 'lint-summary'
-
-  constructor: ->
-    super()
-
-    @find('.linter-name')
-    @find('.linter-name')
-
-  destruct: ->
-    #TODO implement

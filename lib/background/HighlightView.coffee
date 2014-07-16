@@ -1,4 +1,4 @@
-{ View } = require 'atom'
+View = require '../View'
 MarkerView = require './MarkerView'
 { config } = atom
 
@@ -14,12 +14,9 @@ class HighlightView extends View
   configProperty: ''
 
   constructor: ->
-    super()
+    super
     config.observe @configProperty, =>
       @setEnabled config.get @configProperty
-
-  destruct: ->
-    @remove()
 
   update: (rowsList) ->
     @empty()

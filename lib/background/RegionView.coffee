@@ -1,4 +1,4 @@
-{ View } = require 'atom'
+View = require '../View'
 
 module.exports =
 class RegionView extends View
@@ -33,10 +33,3 @@ class RegionView extends View
       top   : tl.top
       width : br.left - tl.left
       height: br.top - tl.top
-
-  remove: ->
-    @destruct()
-    super
-
-  destruct: ->
-    console.log 'RegionView::destruct'

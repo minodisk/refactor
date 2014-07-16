@@ -1,4 +1,4 @@
-{ View } = require 'atom'
+View = require '../View'
 RegionView = require './RegionView'
 
 module.exports =
@@ -14,10 +14,3 @@ class MarkerView extends View
     max = rows.length - 1
     for row, i in rows
       @append new RegionView row, i is min, i is max
-
-  remove: ->
-    @destruct()
-    super
-
-  destruct: ->
-    console.log 'MarkerView::destruct'
