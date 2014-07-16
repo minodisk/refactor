@@ -3,10 +3,17 @@
   "main": "./lib/refactor",
   "version": "0.1.0",
   "description": "Refactoring support",
-  "repository": "https://github.com/atom-refactor/refactor",
+  "repository": "https://github.com/minodisk/refactor",
   "license": "MIT",
+  "auther": {
+    "name": "Daisuke Mino",
+    "url": "http://dsk.mn"
+  },
   "engines": {
     "atom": ">0.50.0"
+  },
+  "scripts": {
+    "test": "apm test"
   },
   "dependencies": {
     "eventemitter2": "^0.4.14",
