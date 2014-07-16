@@ -2,8 +2,6 @@ Watcher = require './Watcher'
 ModuleManager = require './ModuleManager'
 { packages: packageManager } = atom
 
-#TODO npm uninstall --save loophole cson
-
 module.exports =
 new class Main
 
