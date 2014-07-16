@@ -3,7 +3,7 @@
   "main": "./lib/refactor",
   "version": "0.0.0",
   "description": "Refactoring support",
-  "repository": "https://github.com/atom/refactor",
+  "repository": "https://github.com/atom-refactor/refactor",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
