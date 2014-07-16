@@ -12,6 +12,8 @@ class ModuleManager extends EventEmitter2
 
   constructor: ->
     super
+    @setMaxListeners 0
+
     #TODO update when package is enabled
     # config.on 'updated.core-disabledPackages', @update
     #TODO read version from package.json

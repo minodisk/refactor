@@ -4,6 +4,9 @@ View = require '../View'
 module.exports =
 class GutterView extends View
 
+  @content: ->
+    @div()
+
   constructor: (@gutter) ->
     super()
 
