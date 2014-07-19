@@ -137,7 +137,7 @@ class Watcher extends EventEmitter2
     if cursor?
       range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
       unless range.isEmpty()
-        ranges = @ripper.find range
+        ranges = @ripper.find range.start
     rowsList = for range in ranges
       @rangeToRows range
     @referenceView.update rowsList
@@ -155,7 +155,7 @@ class Watcher extends EventEmitter2
 
     cursor = @editor.cursors[0]
     range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
-    refRanges = @ripper.find range
+    refRanges = @ripper.find range.start
     return false if refRanges.length is 0
 
     # Save cursor info.
