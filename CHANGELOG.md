@@ -1,3 +1,7 @@
+## v0.2.1 on 2014/07/23
+
+* Highlight in more responsive way.
+
 ## v0.2.0 on 2014/07/19
 
 * Find tokens contains cursor's point not range.
