@@ -61,8 +61,7 @@ class Watcher extends EventEmitter2
     # Start listening
     @editorView.on 'cursor:moved', @onCursorMoved
     @editor.on 'destroyed', @onDestroyed
-    # @editor.on 'contents-modified', @onContentsModified
-    @editor.buffer.on 'changed', @onContentsModified
+    @editor.buffer.on 'changed', @onBufferChanged
 
     # Execute
     @parse()
@@ -71,8 +70,9 @@ class Watcher extends EventEmitter2
     # Stop listening
     @editorView.off 'cursor:moved', @onCursorMoved
     @editor.off 'destroyed', @onDestroyed
-    # @editor.off 'contents-modified', @onContentsModified
-    @editor.buffer.off 'changed', @onContentsModified
+    @editor.buffer.off 'changed', @onBufferChanged
+    clearTimeout @bufferChangedTimeoutId
+    clearTimeout @cursorMovedTimeoutId
 
     # Destruct instances
     @ripper?.destruct()
@@ -82,6 +82,8 @@ class Watcher extends EventEmitter2
     @statusView?.destruct()
 
     # Remove references
+    delete @bufferChangedTimeoutId
+    delete @cursorMovedTimeoutId
     delete @module
     delete @ripper
     delete @referenceView
@@ -99,7 +101,7 @@ class Watcher extends EventEmitter2
   5. Start listening cursor move event.
   ###
 
-  parse: ->
+  parse: =>
     @editorView.off 'cursor:moved', @onCursorMoved
     @hideError()
     @referenceView.update()
@@ -201,14 +203,13 @@ class Watcher extends EventEmitter2
   User events
   ###
 
-  onContentsModified: =>
-    @parse()
+  onBufferChanged: =>
+    clearTimeout @bufferChangedTimeoutId
+    @bufferChangedTimeoutId = setTimeout @parse, 0
 
   onCursorMoved: =>
-    # clearTimeout @timeoutId
-    # @timeoutId = setTimeout @updateReferences, 0
-    # nextTick => @updateReferences()
-    @updateReferences()
+    clearTimeout @cursorMovedTimeoutId
+    @cursorMovedTimeoutId = setTimeout @updateReferences, 0
 
 
   ###
