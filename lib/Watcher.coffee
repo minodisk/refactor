@@ -4,6 +4,7 @@ ErrorView = require './background/ErrorView'
 GutterView = require './gutter/GutterView'
 StatusView = require './status/StatusView'
 { locationDataToRange } = require './utils/LocationDataUtil'
+{ nextTick } = process
 
 module.exports =
 class Watcher extends EventEmitter2
@@ -60,7 +61,8 @@ class Watcher extends EventEmitter2
     # Start listening
     @editorView.on 'cursor:moved', @onCursorMoved
     @editor.on 'destroyed', @onDestroyed
-    @editor.on 'contents-modified', @onContentsModified
+    # @editor.on 'contents-modified', @onContentsModified
+    @editor.buffer.on 'changed', @onContentsModified
 
     # Execute
     @parse()
@@ -69,7 +71,8 @@ class Watcher extends EventEmitter2
     # Stop listening
     @editorView.off 'cursor:moved', @onCursorMoved
     @editor.off 'destroyed', @onDestroyed
-    @editor.off 'contents-modified', @onContentsModified
+    # @editor.off 'contents-modified', @onContentsModified
+    @editor.buffer.off 'changed', @onContentsModified
 
     # Destruct instances
     @ripper?.destruct()
@@ -202,8 +205,10 @@ class Watcher extends EventEmitter2
     @parse()
 
   onCursorMoved: =>
-    clearTimeout @timeoutId
-    @timeoutId = setTimeout @updateReferences, 0
+    # clearTimeout @timeoutId
+    # @timeoutId = setTimeout @updateReferences, 0
+    # nextTick => @updateReferences()
+    @updateReferences()
 
 
   ###
