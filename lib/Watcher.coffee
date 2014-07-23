@@ -43,10 +43,13 @@ class Watcher extends EventEmitter2
     @deactivate()
     scopeName = @editor.getGrammar().scopeName
     @module = @moduleManager.getModule scopeName
+    console.log 'verifyGrammar', scopeName, @module
     return unless @module?
     @activate()
 
   activate: ->
+    #TODO deactivate it
+
     # Setup model
     @ripper = new @module.Ripper @editor
 
