@@ -43,7 +43,6 @@ new class Main
   ###
 
   onCreated: (editorView) =>
-    console.log 'onCreated'
     watcher = new Watcher @moduleManager, editorView
     watcher.on 'destroyed', @onDestroyed
     @watchers.push watcher
