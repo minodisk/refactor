@@ -47,8 +47,10 @@ class Watcher extends EventEmitter2
     @activate()
 
   activate: ->
+    #TODO deactivate it
+
     # Setup model
-    @ripper = new @module.Ripper @editor
+    @ripper = new @module.Ripper @editor #TODO no longer needs Editor instance
 
     # Setup views
     @referenceView = new ReferenceView
@@ -137,12 +139,9 @@ class Watcher extends EventEmitter2
     @editorView.on 'cursor:moved', @onCursorMoved
 
   updateReferences: =>
-    ranges = []
-    cursor = @editor.cursors[0]
-    if cursor?
-      range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
-      unless range.isEmpty()
-        ranges = @ripper.find range.start
+    # cursor = @editor.cursors[0]
+    # ranges = @ripper.find cursor.getCurrentWordBufferRange(includeNonWordCharacters: true).start
+    ranges = @ripper.find @editor.getSelectedBufferRange().start
     rowsList = for range in ranges
       @rangeToRows range
     @referenceView.update rowsList
@@ -159,7 +158,7 @@ class Watcher extends EventEmitter2
     return false unless @isActive()
 
     cursor = @editor.cursors[0]
-    range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
+    range = cursor.getCurrentWordBufferRange includeNonWordCharacters: true
     refRanges = @ripper.find range.start
     return false if refRanges.length is 0
 
