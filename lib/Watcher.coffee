@@ -4,7 +4,6 @@ ErrorView = require './background/ErrorView'
 GutterView = require './gutter/GutterView'
 StatusView = require './status/StatusView'
 { locationDataToRange } = require './utils/LocationDataUtil'
-{ nextTick } = process
 
 module.exports =
 class Watcher extends EventEmitter2
@@ -105,46 +104,43 @@ class Watcher extends EventEmitter2
 
   parse: =>
     @editorView.off 'cursor:moved', @onCursorMoved
-    @hideError()
-    @referenceView.update()
-
+    @destroyErrorMarkers()
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
-      @ripper.parse text, (err) =>
-        if err?
-          @showError err
-          return
-        @hideError()
-        @onParseEnd()
+      @ripper.parse text, (error) => #TODO update API: error -> errors
+        @onParseEnd if error? then [error] else null
     else
       @onParseEnd()
 
-  showError: ({ location, message }) =>
-    return unless location?
-    range = locationDataToRange location
-    err =
-      range  : range
-      message: message
-    @errorView.update [ @rangeToRows range ]
-    @gutterView.update [ err ]
-
-  hideError: =>
-    @errorView.update()
-    @gutterView.update()
-
-  onParseEnd: =>
+  onParseEnd: (errors) =>
+    if errors?
+      @createErrorMarkers errors
     @updateReferences()
     @editorView.off 'cursor:moved', @onCursorMoved
     @editorView.on 'cursor:moved', @onCursorMoved
 
+  destroyErrorMarkers: ->
+    if @errorMarkers?
+      for marker in @errorMarkers
+        marker.destroy()
+
+  createErrorMarkers: (errors) =>
+    @errorMarkers = for { location, message } in errors
+      range = locationDataToRange location #TODO update API: include not a location but a Range
+      marker = @editor.markBufferRange range
+      decoration = @editor.decorateMarker marker, type: 'highlight', class: 'refactor-error'
+      marker
+
   updateReferences: =>
-    # cursor = @editor.cursors[0]
-    # ranges = @ripper.find cursor.getCurrentWordBufferRange(includeNonWordCharacters: true).start
+    if @markers?
+      for marker in @markers
+        marker.destroy()
     ranges = @ripper.find @editor.getSelectedBufferRange().start
-    rowsList = for range in ranges
-      @rangeToRows range
-    @referenceView.update rowsList
+    @markers = for range in ranges
+      marker = @editor.markBufferRange range
+      decoration = @editor.decorateMarker marker, type: 'highlight', class: 'refactor-reference'
+      marker
 
 
   ###
