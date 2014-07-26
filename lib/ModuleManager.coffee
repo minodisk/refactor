@@ -27,7 +27,6 @@ class ModuleManager extends EventEmitter2
     delete @modules
 
   update: =>
-    console.log 'refactor:update'
     @modules = {}
     # Search packages related to refactor package.
     for metaData in packageManager.getAvailablePackageMetadata()
