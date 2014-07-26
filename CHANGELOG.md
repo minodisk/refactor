@@ -1,3 +1,7 @@
+## v0.2.2 on 2014/07/23
+
+* Fixes not highlighting issue when the cursor is left of a word starting with `$`. #3
+
 ## v0.2.1 on 2014/07/23
 
 * Highlight in more responsive way.
