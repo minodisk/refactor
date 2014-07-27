@@ -1,6 +1,5 @@
 { EventEmitter2 } = require 'eventemitter2'
-StatusView = require './status/StatusView'
-{ locationDataToRange } = require './utils/LocationDataUtil'
+{ locationDataToRange } = require './location_data_util'
 
 module.exports =
 class Watcher extends EventEmitter2
@@ -48,9 +47,6 @@ class Watcher extends EventEmitter2
     # Setup model
     @ripper = new @module.Ripper @editor #TODO no longer needs Editor instance
 
-    # Setup views
-    @statusView = new StatusView
-
     # Start listening
     @editorView.on 'cursor:moved', @onCursorMoved
     @editor.on 'destroyed', @onDestroyed
@@ -69,14 +65,12 @@ class Watcher extends EventEmitter2
 
     # Destruct instances
     @ripper?.destruct()
-    @statusView?.destruct()
 
     # Remove references
     delete @bufferChangedTimeoutId
     delete @cursorMovedTimeoutId
     delete @module
     delete @ripper
-    delete @statusView
 
 
   ###
