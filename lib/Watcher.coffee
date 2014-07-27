@@ -1,7 +1,4 @@
 { EventEmitter2 } = require 'eventemitter2'
-ReferenceView = require './background/ReferenceView'
-ErrorView = require './background/ErrorView'
-GutterView = require './gutter/GutterView'
 StatusView = require './status/StatusView'
 { locationDataToRange } = require './utils/LocationDataUtil'
 
@@ -52,11 +49,6 @@ class Watcher extends EventEmitter2
     @ripper = new @module.Ripper @editor #TODO no longer needs Editor instance
 
     # Setup views
-    @referenceView = new ReferenceView
-    @editorView.underlayer.append @referenceView
-    @errorView = new ErrorView
-    @editorView.underlayer.append @errorView
-    @gutterView = new GutterView @editorView.gutter
     @statusView = new StatusView
 
     # Start listening
@@ -77,9 +69,6 @@ class Watcher extends EventEmitter2
 
     # Destruct instances
     @ripper?.destruct()
-    @referenceView?.destruct()
-    @errorView?.destruct()
-    @gutterView?.destruct()
     @statusView?.destruct()
 
     # Remove references
@@ -87,9 +76,6 @@ class Watcher extends EventEmitter2
     delete @cursorMovedTimeoutId
     delete @module
     delete @ripper
-    delete @referenceView
-    delete @errorView
-    delete @gutterView
     delete @statusView
 
 
