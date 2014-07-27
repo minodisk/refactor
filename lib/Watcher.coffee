@@ -121,25 +121,32 @@ class Watcher extends EventEmitter2
     @editorView.on 'cursor:moved', @onCursorMoved
 
   destroyErrorMarkers: ->
-    if @errorMarkers?
-      for marker in @errorMarkers
-        marker.destroy()
+    return unless @errorMarkers?
+    for marker in @errorMarkers
+      marker.destroy()
 
   createErrorMarkers: (errors) =>
     @errorMarkers = for { location, message } in errors
       range = locationDataToRange location #TODO update API: include not a location but a Range
       marker = @editor.markBufferRange range
-      decoration = @editor.decorateMarker marker, type: 'highlight', class: 'refactor-error'
+      @editor.decorateMarker marker, type: 'highlight', class: 'refactor-error'
+      @editor.decorateMarker marker, type: 'gutter', class: 'refactor-error'
       marker
 
   updateReferences: =>
-    if @markers?
-      for marker in @markers
-        marker.destroy()
+    @destroyReferenceMarkers()
     ranges = @ripper.find @editor.getSelectedBufferRange().start
+    @createReferenceMarkers ranges
+
+  destroyReferenceMarkers: ->
+    return unless @markers?
+    for marker in @markers
+      marker.destroy()
+
+  createReferenceMarkers: (ranges) ->
     @markers = for range in ranges
       marker = @editor.markBufferRange range
-      decoration = @editor.decorateMarker marker, type: 'highlight', class: 'refactor-reference'
+      @editor.decorateMarker marker, type: 'highlight', class: 'refactor-reference'
       marker
 
 

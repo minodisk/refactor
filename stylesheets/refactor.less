@@ -17,6 +17,18 @@
   }
 }
 
+.gutter {
+  .refactor-error {
+    .icon-right {
+      visibility: visible;
+      &:before {
+        content: @alert;
+        color: @text-color-error;
+      }
+    }
+  }
+}
+
 .editor {
   .gutter {
     .line-number {
