@@ -1,5 +1,9 @@
 # Refactor Package
 
+**Check 'Use React Editor' in preferences pane.
+Refactor package doesn't support for legacy editor.**
+See [React Editor Enabled by Default](http://blog.atom.io/2014/07/22/default-to-react-editor.html).
+
 Let's refactor code!
 With this package, you can rename the name of variables and functions easily.
 
@@ -8,7 +12,7 @@ With this package, you can rename the name of variables and functions easily.
 ## Language plugins
 
 This package works with these language plugins.
-You can install using the Preferences pane.
+You can install using the preferences pane.
 
 * [coffee-refactor](https://atom.io/packages/coffee-refactor) for CoffeeScript
 * [js-refactor](https://atom.io/packages/js-refactor) for JavaScript
