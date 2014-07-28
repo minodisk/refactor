@@ -45,7 +45,7 @@ class Watcher extends EventEmitter2
     #TODO deactivate it
 
     # Setup model
-    @ripper = new @module.Ripper @editor #TODO no longer needs Editor instance
+    @ripper = new @module.Ripper @editor #TODO deprecate pass Editor in v0.4
 
     # Start listening
     @editorView.on 'cursor:moved', @onCursorMoved
