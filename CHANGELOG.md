@@ -3,6 +3,7 @@
 * Replace highlight implementation to Decoration API.
 * Support React editor.
 * End of support for the editor based on space-pen.
+* Remove `constructor` and `destruct` from [API interface](https://github.com/minodisk/refactor#interface).
 
 ## v0.2.2 on 2014/07/23
 
