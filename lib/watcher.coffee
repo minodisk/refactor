@@ -106,8 +106,11 @@ class Watcher extends EventEmitter2
       marker.destroy()
 
   createErrorMarkers: (errors) =>
-    @errorMarkers = for { location, message } in errors
-      range = locationDataToRange location #TODO update API: include not a location but a Range
+    @errorMarkers = for { location, range, message } in errors
+      #TODO remove verification of the location: location is supported in ~v0.2.*
+      if location?
+        range = locationDataToRange location
+
       marker = @editor.markBufferRange range
       @editor.decorateMarker marker, type: 'highlight', class: 'refactor-error'
       @editor.decorateMarker marker, type: 'gutter', class: 'refactor-error'
