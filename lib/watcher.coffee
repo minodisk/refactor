@@ -1,10 +1,5 @@
 { EventEmitter2 } = require 'eventemitter2'
-ReferenceView = require './background/ReferenceView'
-ErrorView = require './background/ErrorView'
-GutterView = require './gutter/GutterView'
-StatusView = require './status/StatusView'
-{ locationDataToRange } = require './utils/LocationDataUtil'
-{ nextTick } = process
+{ locationDataToRange } = require './location_data_util'
 
 module.exports =
 class Watcher extends EventEmitter2
@@ -52,14 +47,6 @@ class Watcher extends EventEmitter2
     # Setup model
     @ripper = new @module.Ripper @editor #TODO no longer needs Editor instance
 
-    # Setup views
-    @referenceView = new ReferenceView
-    @editorView.underlayer.append @referenceView
-    @errorView = new ErrorView
-    @editorView.underlayer.append @errorView
-    @gutterView = new GutterView @editorView.gutter
-    @statusView = new StatusView
-
     # Start listening
     @editorView.on 'cursor:moved', @onCursorMoved
     @editor.on 'destroyed', @onDestroyed
@@ -78,20 +65,12 @@ class Watcher extends EventEmitter2
 
     # Destruct instances
     @ripper?.destruct()
-    @referenceView?.destruct()
-    @errorView?.destruct()
-    @gutterView?.destruct()
-    @statusView?.destruct()
 
     # Remove references
     delete @bufferChangedTimeoutId
     delete @cursorMovedTimeoutId
     delete @module
     delete @ripper
-    delete @referenceView
-    delete @errorView
-    delete @gutterView
-    delete @statusView
 
 
   ###
@@ -105,46 +84,50 @@ class Watcher extends EventEmitter2
 
   parse: =>
     @editorView.off 'cursor:moved', @onCursorMoved
-    @hideError()
-    @referenceView.update()
-
+    @destroyErrorMarkers()
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
-      @ripper.parse text, (err) =>
-        if err?
-          @showError err
-          return
-        @hideError()
-        @onParseEnd()
+      @ripper.parse text, (error) => #TODO update API: error -> errors
+        @onParseEnd if error? then [error] else null
     else
       @onParseEnd()
 
-  showError: ({ location, message }) =>
-    return unless location?
-    range = locationDataToRange location
-    err =
-      range  : range
-      message: message
-    @errorView.update [ @rangeToRows range ]
-    @gutterView.update [ err ]
-
-  hideError: =>
-    @errorView.update()
-    @gutterView.update()
-
-  onParseEnd: =>
+  onParseEnd: (errors) =>
+    if errors?
+      @createErrorMarkers errors
     @updateReferences()
     @editorView.off 'cursor:moved', @onCursorMoved
     @editorView.on 'cursor:moved', @onCursorMoved
 
+  destroyErrorMarkers: ->
+    return unless @errorMarkers?
+    for marker in @errorMarkers
+      marker.destroy()
+
+  createErrorMarkers: (errors) =>
+    @errorMarkers = for { location, message } in errors
+      range = locationDataToRange location #TODO update API: include not a location but a Range
+      marker = @editor.markBufferRange range
+      @editor.decorateMarker marker, type: 'highlight', class: 'refactor-error'
+      @editor.decorateMarker marker, type: 'gutter', class: 'refactor-error'
+      marker
+
   updateReferences: =>
-    # cursor = @editor.cursors[0]
-    # ranges = @ripper.find cursor.getCurrentWordBufferRange(includeNonWordCharacters: true).start
+    @destroyReferenceMarkers()
     ranges = @ripper.find @editor.getSelectedBufferRange().start
-    rowsList = for range in ranges
-      @rangeToRows range
-    @referenceView.update rowsList
+    @createReferenceMarkers ranges
+
+  destroyReferenceMarkers: ->
+    return unless @markers?
+    for marker in @markers
+      marker.destroy()
+
+  createReferenceMarkers: (ranges) ->
+    @markers = for range in ranges
+      marker = @editor.markBufferRange range
+      @editor.decorateMarker marker, type: 'highlight', class: 'refactor-reference'
+      marker
 
 
   ###

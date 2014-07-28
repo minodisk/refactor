@@ -1,7 +1,7 @@
 {
   "name": "refactor",
   "main": "./lib/refactor",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Refactoring support",
   "repository": "https://github.com/minodisk/refactor",
   "license": "MIT",
