@@ -88,8 +88,13 @@ class Watcher extends EventEmitter2
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
-      @ripper.parse text, (error) => #TODO update API: error -> errors
-        @onParseEnd if error? then [error] else null
+      @ripper.parse text, (errors) => #TODO deprecate verification of array in v0.4
+        @onParseEnd unless errors?
+          null
+        else unless Array.isArray errors
+          [errors]
+        else
+          errors
     else
       @onParseEnd()
 
@@ -107,8 +112,7 @@ class Watcher extends EventEmitter2
 
   createErrorMarkers: (errors) =>
     @errorMarkers = for { location, range, message } in errors
-      #TODO remove verification of the location: location is supported in ~v0.2.*
-      if location?
+      if location? #TODO deprecate verification of the location in v0.4
         range = locationDataToRange location
 
       marker = @editor.markBufferRange range

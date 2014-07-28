@@ -36,7 +36,7 @@ You can install using the preferences pane.
 Implement `Ripper` class in main module.
 
 * `Ripper.scopeNames []String` : **[Required]** Array of scope name, like 'source.coffee', 'source.js' and all that.
-* `Ripper#parse(code String, callback Function)` : **[Required]** Parse code, and you should callback when the parsing process is done. Callback specify the params as an `Error` array. `Error` should have params `range` and `message`.
+* `Ripper#parse(code String, callback Function)` : **[Required]** Parse code, and you should callback when the parsing process is done. Callback specify the params as an array of `Error`. `Error` should have params `range` and `message`.
 * `Ripper#find(point Point, editor Editor) []Range` : **[Required]** Array of found symbol's `Range`.
 * `Ripper#constructor(editor)` : **[Optional]** Pass the target `Editor`.
 * `Ripper#destruct()` : **[Optional]** Delete every reference.
