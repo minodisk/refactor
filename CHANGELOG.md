@@ -1,3 +1,9 @@
+## v0.3.0 on 2014/07/28
+
+* Replace highlight implementation to Decoration API.
+* Support React editor.
+* End of support for the editor based on space-pen.
+
 ## v0.2.2 on 2014/07/23
 
 * Fixes not highlighting issue when the cursor is left of a word starting with `$`. #3
