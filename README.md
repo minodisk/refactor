@@ -1,8 +1,8 @@
 # Refactor Package
 
-**Check 'Use React Editor' in preferences pane.
-Refactor package doesn't support for legacy editor.**
-See [React Editor Enabled by Default](http://blog.atom.io/2014/07/22/default-to-react-editor.html).
+**:zap:Notification:zap:: Activate 'Use React Editor' in preferences pane.**
+Refactor package greater than v0.3 no longer supports for the legacy editor.
+If you want more info about the React Editor, you can see [React Editor Enabled by Default](http://blog.atom.io/2014/07/22/default-to-react-editor.html).
 
 Let's refactor code!
 With this package, you can rename the name of variables and functions easily.
