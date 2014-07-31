@@ -1,5 +1,6 @@
-## v0.3.1 on 2014/07/28
+## v0.4.0 on 2014/07/31
 
+* Improve renaming process with using `Marker`.
 * Fixes not starting highlight when file is opened and window is reloaded.
 
 ## v0.3.0 on 2014/07/28
