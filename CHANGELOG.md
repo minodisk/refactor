@@ -1,6 +1,6 @@
 ## v0.4.0 on 2014/07/31
 
-* Improve renaming process with using `Marker` and `Decoration`.
+* Improves renaming process with using `Marker` and `Decoration`.
 * Fixes not starting highlight when file is opened and window is reloaded.
 * Fixes issue fails to rename symbol starting with `$`.
 
