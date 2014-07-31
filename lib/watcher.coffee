@@ -84,8 +84,8 @@ class Watcher extends EventEmitter2
 
   parse: =>
     @editorView.off 'cursor:moved', @onCursorMoved
-    @destroyReferenceMarkers()
-    @destroyErrorMarkers()
+    @destroyReferences()
+    @destroyErrors()
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
@@ -101,17 +101,18 @@ class Watcher extends EventEmitter2
 
   onParseEnd: (errors) =>
     if errors?
-      @createErrorMarkers errors
-    @createReferenceMarkers @ripper.find @editor.getSelectedBufferRange().start
+      @createErrors errors
+    @createReferences()
     @editorView.off 'cursor:moved', @onCursorMoved
     @editorView.on 'cursor:moved', @onCursorMoved
 
-  destroyErrorMarkers: ->
+  destroyErrors: ->
     return unless @errorMarkers?
     for marker in @errorMarkers
       marker.destroy()
+    delete @errorMarkers
 
-  createErrorMarkers: (errors) =>
+  createErrors: (errors) =>
     @errorMarkers = for { location, range, message } in errors
       if location? #TODO deprecate verification of the location in v0.4
         range = locationDataToRange location
@@ -121,13 +122,16 @@ class Watcher extends EventEmitter2
       @editor.decorateMarker marker, type: 'gutter', class: 'refactor-error'
       marker
 
-  destroyReferenceMarkers: ->
+  destroyReferences: ->
+    delete @references
     return unless @markers?
     for marker in @markers
       marker.destroy()
+    delete @markers
 
-  createReferenceMarkers: (ranges) ->
-    @markers = for range in ranges
+  createReferences: ->
+    @references = @ripper.find @editor.getSelectedBufferRange().start
+    @markers = for range in @references
       marker = @editor.markBufferRange range
       @editor.decorateMarker marker, type: 'highlight', class: 'refactor-reference'
       marker
@@ -197,8 +201,8 @@ class Watcher extends EventEmitter2
     @cursorMovedTimeoutId = setTimeout @onCursorMovedAfter, 0
 
   onCursorMovedAfter: =>
-    @destroyReferenceMarkers()
-    @createReferenceMarkers @ripper.find @editor.getSelectedBufferRange().start
+    @destroyReferences()
+    @createReferences()
 
 
   ###
