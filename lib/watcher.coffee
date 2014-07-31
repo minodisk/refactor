@@ -45,7 +45,7 @@ class Watcher extends EventEmitter2
 
   activate: ->
     # Setup model
-    @ripper = new @module.Ripper @editor #TODO deprecate pass Editor in v0.4
+    @ripper = new @module.Ripper()
 
     # Start listening
     @editorView.on 'cursor:moved', @onCursorMoved
@@ -91,13 +91,7 @@ class Watcher extends EventEmitter2
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
-      @ripper.parse text, (errors) => #TODO deprecate verification of array in v0.4
-        @onParseEnd unless errors?
-          null
-        else unless Array.isArray errors
-          [errors]
-        else
-          errors
+      @ripper.parse text, @onParseEnd
     else
       @onParseEnd()
 
@@ -116,7 +110,7 @@ class Watcher extends EventEmitter2
 
   createErrors: (errors) =>
     @errorMarkers = for { location, range, message } in errors
-      if location? #TODO deprecate verification of the location in v0.4
+      if location? #TODO deprecate verification of the location in v0.5
         range = locationDataToRange location
 
       marker = @editor.markBufferRange range
@@ -181,7 +175,7 @@ class Watcher extends EventEmitter2
 
   abort: =>
     # When this editor is not active, do nothing.
-    return unless @isActive()
+    return unless @isActive() and @renamingCursor? and @renamingMarkers?
 
     # Verify all cursors are in renaming markers.
     # When the cursor is out of marker at least one, abort renaming.
@@ -200,7 +194,7 @@ class Watcher extends EventEmitter2
 
   done: ->
     # When this editor is not active, returns false to abort keyboard binding.
-    return false unless @isActive()
+    return false unless @isActive() and @renamingCursor? and @renamingMarkers?
 
     # Stop renaming life cycle.
     @editorView.off 'cursor:moved', @abort
