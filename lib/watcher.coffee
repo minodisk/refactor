@@ -125,16 +125,12 @@ class Watcher extends EventEmitter2
       marker
 
   destroyReferences: ->
-    console.log '  destroyReferences'
-
     return unless @referenceMarkers?
     for marker in @referenceMarkers
       marker.destroy()
     delete @referenceMarkers
 
   createReferences: ->
-    console.log '  createReferences'
-
     ranges = @ripper.find @editor.getSelectedBufferRange().start
     @referenceMarkers = for range in ranges
       marker = @editor.markBufferRange range
