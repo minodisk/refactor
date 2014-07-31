@@ -1,7 +1,10 @@
+## v0.3.1 on 2014/07/28
+
+* Fixes not starting highlight when file is opened and window is reloaded.
+
 ## v0.3.0 on 2014/07/28
 
 * Replace highlight implementation to Decoration API.
-* Support React editor.
 * End of support for the editor based on space-pen.
 * Remove `constructor` and `destruct` from [API interface](https://github.com/minodisk/refactor#interface).
 

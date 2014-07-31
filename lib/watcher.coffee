@@ -35,15 +35,15 @@ class Watcher extends EventEmitter2
   ###
 
   verifyGrammar: =>
-    @deactivate()
     scopeName = @editor.getGrammar().scopeName
-    @module = @moduleManager.getModule scopeName
-    return unless @module?
+    module = @moduleManager.getModule scopeName
+    return if module is @module
+    @deactivate()
+    return unless module?
+    @module = module
     @activate()
 
   activate: ->
-    #TODO deactivate it
-
     # Setup model
     @ripper = new @module.Ripper @editor #TODO deprecate pass Editor in v0.4
 
@@ -166,7 +166,7 @@ class Watcher extends EventEmitter2
 
   cancel: =>
     return if not @renameInfo? or
-                  @renameInfo.range.start.isEqual @renameInfo.cursor.getCurrentWordBufferRange(includeNonWordCharacters: false).start
+              @renameInfo.range.start.isEqual @renameInfo.cursor.getCurrentWordBufferRange(includeNonWordCharacters: false).start
 
     # Set cursor position to current position.
     # Stop listening cursor moved event.
