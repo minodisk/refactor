@@ -2,6 +2,7 @@
 
 * Improve renaming process with using `Marker`.
 * Fixes not starting highlight when file is opened and window is reloaded.
+* Fixes issue fails to rename symbol starting with `$`.
 
 ## v0.3.0 on 2014/07/28
 
