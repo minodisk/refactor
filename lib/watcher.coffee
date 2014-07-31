@@ -84,6 +84,7 @@ class Watcher extends EventEmitter2
 
   parse: =>
     @editorView.off 'cursor:moved', @onCursorMoved
+    @destroyReferenceMarkers()
     @destroyErrorMarkers()
     text = @editor.buffer.getText()
     if text isnt @cachedText
@@ -101,7 +102,7 @@ class Watcher extends EventEmitter2
   onParseEnd: (errors) =>
     if errors?
       @createErrorMarkers errors
-    @updateReferences()
+    @createReferenceMarkers @ripper.find @editor.getSelectedBufferRange().start
     @editorView.off 'cursor:moved', @onCursorMoved
     @editorView.on 'cursor:moved', @onCursorMoved
 
@@ -119,11 +120,6 @@ class Watcher extends EventEmitter2
       @editor.decorateMarker marker, type: 'highlight', class: 'refactor-error'
       @editor.decorateMarker marker, type: 'gutter', class: 'refactor-error'
       marker
-
-  updateReferences: =>
-    @destroyReferenceMarkers()
-    ranges = @ripper.find @editor.getSelectedBufferRange().start
-    @createReferenceMarkers ranges
 
   destroyReferenceMarkers: ->
     return unless @markers?
@@ -198,7 +194,11 @@ class Watcher extends EventEmitter2
 
   onCursorMoved: =>
     clearTimeout @cursorMovedTimeoutId
-    @cursorMovedTimeoutId = setTimeout @updateReferences, 0
+    @cursorMovedTimeoutId = setTimeout @onCursorMovedAfter, 0
+
+  onCursorMovedAfter: =>
+    @destroyReferenceMarkers()
+    @createReferenceMarkers @ripper.find @editor.getSelectedBufferRange().start
 
 
   ###
