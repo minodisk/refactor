@@ -27,10 +27,10 @@ class Watcher extends EventEmitter2
 
 
   ###
-  Grammar checker
+  Grammar valification process
   1. Detect grammar changed.
   2. Destroy instances and listeners.
-  3. Exit when grammar isn't CoffeeScript.
+  3. Exit process when the language plugin of the grammar can't be found.
   4. Create instances and listeners.
   ###
 
@@ -98,9 +98,10 @@ class Watcher extends EventEmitter2
   onParseEnd: (errors) =>
     if errors?
       @createErrors errors
-    @createReferences()
-    @editorView.off 'cursor:moved', @onCursorMoved
-    @editorView.on 'cursor:moved', @onCursorMoved
+    else
+      @createReferences()
+      @editorView.off 'cursor:moved', @onCursorMoved
+      @editorView.on 'cursor:moved', @onCursorMoved
 
   destroyErrors: ->
     return unless @errorMarkers?
