@@ -1,21 +1,16 @@
 { isMaster } = cluster = require 'cluster'
 
+if cluster.isMaster
+  console.log 'master'
+  worker = cluster.fork()
+  worker.on 'message', (msg) ->
+    console.log msg
+  worker.send 'hi there'
+else if cluster.isWorker
+  console.log 'worker'
+  process.on 'message', (msg) ->
+    process.send msg
 
-class ParentProcess
+{ join } = require 'path'
 
-  constructor: (@Ripper) ->
-
-class ChildProcess
-
-  constructor: (@Ripper) ->
-
-if isMaster
-  module.exports = ParentProcess
-  cluster.on 'death', ->
-    worker = cluster.fork()
-    worker.on 'message', (msg) ->
-else
-  module.exports = ChildProcess
-  process.send cmd: 'foo'
-  process.send cmd: 'close'
-  process.exit 0
+worker = new Worker join __dirname, 'worker.js'

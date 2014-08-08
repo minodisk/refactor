@@ -2,6 +2,10 @@
 { EventEmitter2 } = require 'eventemitter2'
 { workspace, config, packages: packageManager } = atom
 
+setTimeout ->
+  require './ripper_wrapper'
+, 3000
+
 isFunction = (func) -> (typeof func) is 'function'
 
 module.exports =
