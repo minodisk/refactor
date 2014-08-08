@@ -8,9 +8,10 @@ new class Main
   renameCommand: 'refactor:rename'
   doneCommand: 'refactor:done'
 
-  configDefaults:
-    highlightError    : true
-    highlightReference: true
+  # TODO enable config
+  # configDefaults:
+  #   highlightError    : true
+  #   highlightReference: true
 
 
   ###
