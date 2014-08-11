@@ -46,6 +46,8 @@ class Watcher extends EventEmitter2
   activate: ->
     # Setup model
     @ripper = new @module.Ripper()
+    @ripper.on 'parsed', @onRipperParsed
+    @ripper.on 'found', @onRipperFound
 
     # Start listening
     @editorView.on 'cursor:moved', @onCursorMoved
@@ -91,17 +93,27 @@ class Watcher extends EventEmitter2
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
-      @ripper.parse text, @onParseEnd
+      # @ripper.parse text, @onParseEnd
+      @ripper.parse text
     else
-      @onParseEnd()
+      # @onParseEnd()
+      @onRipperParsed()
 
-  onParseEnd: (errors) =>
-    if errors?
-      @createErrors errors
+  onRipperParsed: (returns) =>
+    if returns?.errors?
+      @createErrors returns.errors
     else
       @createReferences()
       @editorView.off 'cursor:moved', @onCursorMoved
       @editorView.on 'cursor:moved', @onCursorMoved
+
+  # onParseEnd: (errors) =>
+  #   if errors?
+  #     @createErrors errors
+  #   else
+  #     @createReferences()
+  #     @editorView.off 'cursor:moved', @onCursorMoved
+  #     @editorView.on 'cursor:moved', @onCursorMoved
 
   destroyErrors: ->
     return unless @errorMarkers?
@@ -126,7 +138,13 @@ class Watcher extends EventEmitter2
     delete @referenceMarkers
 
   createReferences: ->
-    ranges = @ripper.find @editor.getSelectedBufferRange().start
+    @ripper.find @editor.getSelectedBufferRange().start
+    # @referenceMarkers = for range in ranges
+    #   marker = @editor.markBufferRange range
+    #   @editor.decorateMarker marker, type: 'highlight', class: 'refactor-reference'
+    #   marker
+
+  onRipperFound: (ranges) =>
     @referenceMarkers = for range in ranges
       marker = @editor.markBufferRange range
       @editor.decorateMarker marker, type: 'highlight', class: 'refactor-reference'
