@@ -141,7 +141,7 @@ class Watcher extends EventEmitter2
   ###
 
   rename: ->
-    # When this editor is not active, returns false to abort keyboard binding.
+    # When this editor isn't active, returns false to abort keyboard binding.
     return false unless @isActive()
 
     # Find references.
@@ -175,7 +175,7 @@ class Watcher extends EventEmitter2
     true
 
   abort: =>
-    # When this editor is not active, do nothing.
+    # When this editor isn't active, do nothing.
     return unless @isActive() and @renamingCursor? and @renamingMarkers?
 
     # Verify all cursors are in renaming markers.
@@ -194,7 +194,7 @@ class Watcher extends EventEmitter2
     @done()
 
   done: ->
-    # When this editor is not active, returns false to abort keyboard binding.
+    # When this editor isn't active, returns false for aborting keyboard binding.
     return false unless @isActive() and @renamingCursor? and @renamingMarkers?
 
     # Stop renaming life cycle.
