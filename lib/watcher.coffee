@@ -241,7 +241,7 @@ class Watcher extends EventEmitter2
   ###
 
   isActive: ->
-    @module? and atom.workspaceView.getActivePaneItem() is @editor
+    @module? and atom.workspace.getActivePaneItem() is @editor
 
   # Range to pixel based start and end range for each row.
   rangeToRows: ({ start, end }) ->
