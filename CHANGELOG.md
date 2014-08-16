@@ -1,6 +1,6 @@
-## v0.4.1 on 2014//
+## v0.4.1 on 2014/08/16
 
-* Fixes an issue that highlighting process ran when error has occurred.
+* Replace deprecated method. #10
 
 ## v0.4.0 on 2014/07/31
 
