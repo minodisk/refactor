@@ -22,6 +22,7 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-este-watch": "^0.1.16",
-    "grunt-notify": "^0.3.0"
+    "grunt-notify": "^0.3.0",
+    "gulp": "^3.8.7"
   }
 }

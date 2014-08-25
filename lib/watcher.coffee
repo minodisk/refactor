@@ -46,8 +46,6 @@ class Watcher extends EventEmitter2
   activate: ->
     # Setup model
     @ripper = new @module.Ripper()
-    @ripper.on 'parsed', @onRipperParsed
-    @ripper.on 'found', @onRipperFound
 
     # Start listening
     @editorView.on 'cursor:moved', @onCursorMoved
@@ -93,7 +91,7 @@ class Watcher extends EventEmitter2
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
-      @ripper.parse text
+      @ripper.parse text, @onRipperParsed
     else
       @onRipperParsed()
 
@@ -128,7 +126,7 @@ class Watcher extends EventEmitter2
     delete @referenceMarkers
 
   createReferences: ->
-    @ripper.find @editor.getSelectedBufferRange().start
+    @ripper.find @editor.getSelectedBufferRange().start, @onRipperFound
 
   onRipperFound: (ranges) =>
     @destroyReferences()
@@ -152,7 +150,9 @@ class Watcher extends EventEmitter2
     # Find references.
     # When no reference exists, do nothing.
     cursor = @editor.getCursor()
-    ranges = @ripper.find cursor.getBufferPosition()
+    @ripper.find cursor.getBufferPosition(), @onRipperRenameReady
+
+  onRipperRenameReady: (ranges) =>
     return false if ranges.length is 0
 
     # Pause highlighting life cycle.
@@ -163,7 +163,7 @@ class Watcher extends EventEmitter2
     #TODO Cursor::clearAutoScroll()
 
     # Register the triggered cursor.
-    @renamingCursor = cursor
+    @renamingCursor = @editor.getCursor()
     # Select references.
     # Register the markers of the references' ranges.
     # Highlight these markers.
