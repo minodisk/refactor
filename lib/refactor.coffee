@@ -22,8 +22,8 @@ new class Main
     @watchers = []
 
     atom.workspaceView.eachEditorView @onCreated
-    atom.workspaceView.command @renameCommand, @onRename
-    atom.workspaceView.command @doneCommand, @onDone
+    atom.commands.add 'atom-editor', @renameCommand, @onRename
+    atom.commands.add 'atom-editor', @doneCommand, @onDone
 
   deactivate: ->
     @moduleManager.destruct()
