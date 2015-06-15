@@ -42,8 +42,8 @@ new class Main
   Events
   ###
 
-  onCreated: (editorView) =>
-    watcher = new Watcher @moduleManager, editorView
+  onCreated: (editor) =>
+    watcher = new Watcher @moduleManager, editor
     watcher.on 'destroyed', @onDestroyed
     @watchers.push watcher
 
