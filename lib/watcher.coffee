@@ -4,25 +4,29 @@
 module.exports =
 class Watcher extends EventEmitter2
 
-  constructor: (@moduleManager, @editorView) ->
+  constructor: (@moduleManager, @editor) ->
     super()
-    @editor = @editorView.editor
-    @editor.on 'grammar-changed', @verifyGrammar
+    #@editor.on 'grammar-changed', @verifyGrammar
+
+    @editor.onDidChangeCursorPosition @onCursorMoved
+    @editor.onDidDestroy @onDestroyed
+    @editor.onDidChange @onBufferChanged
+
     @moduleManager.on 'changed', @verifyGrammar
     @verifyGrammar()
 
   destruct: =>
     @removeAllListeners()
     @deactivate()
-    @editor.off 'grammar-changed', @verifyGrammar
+    #@editor.off 'grammar-changed', @verifyGrammar
     @moduleManager.off 'changed', @verifyGrammar
 
     delete @moduleManager
-    delete @editorView
     delete @editor
     delete @module
 
   onDestroyed: =>
+    return unless @eventDestroyed
     @emit 'destroyed', @
 
 
@@ -48,18 +52,20 @@ class Watcher extends EventEmitter2
     @ripper = new @module.Ripper()
 
     # Start listening
-    @editorView.on 'cursor:moved', @onCursorMoved
-    @editor.on 'destroyed', @onDestroyed
-    @editor.buffer.on 'changed', @onBufferChanged
+    @eventCursorMoved = on
+    @eventDestroyed = on
+    @eventBufferChanged = on
 
     # Execute
     @parse()
 
   deactivate: ->
     # Stop listening
-    @editorView.off 'cursor:moved', @onCursorMoved
-    @editor.off 'destroyed', @onDestroyed
-    @editor.buffer.off 'changed', @onBufferChanged
+    @cursorMoved = false
+
+    @eventCursorMoved = off
+    @eventDestroyed = off
+    @eventBufferChanged = off
     clearTimeout @bufferChangedTimeoutId
     clearTimeout @cursorMovedTimeoutId
 
@@ -85,7 +91,7 @@ class Watcher extends EventEmitter2
   ###
 
   parse: =>
-    @editorView.off 'cursor:moved', @onCursorMoved
+    @eventCursorMoved = off
     @destroyReferences()
     @destroyErrors()
     text = @editor.buffer.getText()
@@ -100,8 +106,8 @@ class Watcher extends EventEmitter2
       @createErrors errors
     else
       @createReferences()
-      @editorView.off 'cursor:moved', @onCursorMoved
-      @editorView.on 'cursor:moved', @onCursorMoved
+      @eventCursorMoved = off
+      @eventCursorMoved = on
 
   destroyErrors: ->
     return unless @errorMarkers?
@@ -146,14 +152,14 @@ class Watcher extends EventEmitter2
 
     # Find references.
     # When no reference exists, do nothing.
-    cursor = @editor.getCursor()
+    cursor = @editor.getLastCursor()
     ranges = @ripper.find cursor.getBufferPosition()
     return false if ranges.length is 0
 
     # Pause highlighting life cycle.
     @destroyReferences()
-    @editor.buffer.off 'changed', @onBufferChanged
-    @editorView.off 'cursor:moved', @onCursorMoved
+    @eventBufferChanged = off
+    @eventCursorMoved = off
 
     #TODO Cursor::clearAutoScroll()
 
@@ -168,8 +174,8 @@ class Watcher extends EventEmitter2
       @editor.decorateMarker marker, type: 'highlight', class: 'refactor-reference'
       marker
     # Start renaming life cycle.
-    @editorView.off 'cursor:moved', @abort
-    @editorView.on 'cursor:moved', @abort
+    @eventCursorMoved = off
+    @eventCursorMoved = 'abort'
 
     # Returns true not to abort keyboard binding.
     true
@@ -198,7 +204,7 @@ class Watcher extends EventEmitter2
     return false unless @isActive() and @renamingCursor? and @renamingMarkers?
 
     # Stop renaming life cycle.
-    @editorView.off 'cursor:moved', @abort
+    @eventCursorMoved = off
 
     # Reset cursor's position to the triggerd cursor's position.
     @editor.setCursorBufferPosition @renamingCursor.getBufferPosition()
@@ -210,10 +216,10 @@ class Watcher extends EventEmitter2
 
     # Start highlighting life cycle.
     @parse()
-    @editor.buffer.off 'changed', @onBufferChanged
-    @editor.buffer.on 'changed', @onBufferChanged
-    @editorView.off 'cursor:moved', @onCursorMoved
-    @editorView.on 'cursor:moved', @onCursorMoved
+    @eventBufferChanged = off
+    @eventBufferChanged = on
+    @eventCursorMoved = off
+    @eventCursorMoved = on
 
     # Returns true not to abort keyboard binding.
     true
@@ -224,12 +230,17 @@ class Watcher extends EventEmitter2
   ###
 
   onBufferChanged: =>
+    return unless @eventBufferChanged
     clearTimeout @bufferChangedTimeoutId
     @bufferChangedTimeoutId = setTimeout @parse, 0
 
   onCursorMoved: =>
-    clearTimeout @cursorMovedTimeoutId
-    @cursorMovedTimeoutId = setTimeout @onCursorMovedAfter, 0
+    return unless @eventCursorMoved
+    if @eventCursorMoved == 'abort'
+      @abort()
+    else
+      clearTimeout @cursorMovedTimeoutId
+      @cursorMovedTimeoutId = setTimeout @onCursorMovedAfter, 0
 
   onCursorMovedAfter: =>
     @destroyReferences()
