@@ -17,12 +17,12 @@ class ModuleManager extends EventEmitter2
     # config.on 'updated.core-disabledPackages', @update
     #TODO read version from package.json
     # { @version } = JSON.parse readFileSync 'package.json'
-    atom.workspace.on 'coffee-refactor-became-active', @update
+    #atom.workspace.on 'coffee-refactor-became-active', @update
     @update()
 
   destruct: ->
     # config.off 'updated.core-disabledPackages', @update
-    atom.workspace.off 'coffee-refactor-became-active', @update
+    #atom.workspace.off 'coffee-refactor-became-active', @update
 
     delete @modules
 
